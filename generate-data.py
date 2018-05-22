@@ -7,9 +7,10 @@ import json
 
 from faker import Faker
 
-NUM_BATCH = 10
-BATCH_SIZE = 1000
+NUM_BATCH = 1
+BATCH_SIZE = 100000
 BUCKET = 'shhorsfi-select-demo'
+PREFIX = 'single_file_archive'
 
 def create_profile():
     fake = Faker()
@@ -23,15 +24,16 @@ if __name__ == '__main__':
 
     print("Generate Random Data")
     for _ in range(NUM_BATCH):
-        print("Generating Batch: {}".format(_))
+        print("\nGenerating Batch: {}".format(_))
         batch_id = uuid.uuid4()
 
         outfilename = 'profile-{}.txt.gz'.format(batch_id)
         with gzip.open(outfilename, 'wb') as output:
             with io.TextIOWrapper(output, encoding='utf-8', newline='\n') as enc:
                 for _ in range(BATCH_SIZE):
-                    print('.', end='', flush=True)
+                    #print('.', end='', flush=True)
                     enc.write(json.dumps(create_profile(), default=str))
                     enc.write('\n')
 
-        s3.upload_file(outfilename, BUCKET, '{}/{}'.format(uuid.uuid4(), outfilename))
+        s3.upload_file(outfilename, BUCKET, '{}/{}/{}'.format(PREFIX, uuid.uuid4(), outfilename))
+        os.remove(outfilename)
