@@ -14,8 +14,8 @@ jobParameters = {
         }
     },
     "OutputLocation": {
-        "S3": {"BucketName": "glacier-select-output", "Prefix": "1"}
+        "S3": {"BucketName": "shhorsfi-select-demo", "Prefix": "restored"}
     }
 }
 
-glacier.initiate_job(vaultName="reInventSecrets", jobParameters=jobParameters)
+glacier.initiate_job(vaultName="shhorsfi-select-demo", jobParameters=jobParameters)

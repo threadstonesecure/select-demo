@@ -12,7 +12,7 @@ BATCH_COUNT = 1
 BATCH_SIZE = 100000
 BUCKET = 'shhorsfi-select-demo'
 STANDARD_PREFIX = 'standard'
-GLACIER_PREFIX = 'archive'
+GLACIER_PREFIX = 'glacier'
 
 def create_profile():
     fake = Faker()
@@ -41,8 +41,9 @@ def generate_csv_data(bucket, prefix, batch_count, batch_size):
     batch_id = uuid.uuid4()
 
     for _ in range(batch_count):
-        outfilename = open('profile-{}.csv'.format(batch_id), 'w')
-        csvwriter = csv.writer(outfilename)
+        outfilename = 'profile-{}.csv'.format(batch_id)
+        outfile = open('profile-{}.csv'.format(batch_id), 'w')
+        csvwriter = csv.writer(outfile)
         count = 0
         for _ in range(batch_size):
             profile = create_profile()
@@ -51,14 +52,14 @@ def generate_csv_data(bucket, prefix, batch_count, batch_size):
                 csvwriter.writerow(header)
                 count += 1
             csvwriter.writerow(profile.values())
-        outfilename.close()
+        outfile.close()
 
     s3.upload_file(outfilename, bucket, '{}/{}/{}'.format(prefix, uuid.uuid4(), outfilename))
     os.remove(outfilename)
 
 ## Main Execution
 if __name__ == '__main__':
-    #print("Generating JSON data for S3 Demo")
-    #generate_json_data(BUCKET, STANDARD_PREFIX, BATCH_COUNT, BATCH_SIZE)
+    print("Generating JSON data for S3 Demo")
+    generate_json_data(BUCKET, STANDARD_PREFIX, BATCH_COUNT, BATCH_SIZE)
     print("Generating CSV data for Glacier Demo")
     generate_csv_data(BUCKET, GLACIER_PREFIX, BATCH_COUNT, BATCH_SIZE)

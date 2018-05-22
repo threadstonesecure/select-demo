@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: S3 Select Lambda Filtering Demo Function
+Parameters:
+    BucketName:
+        Type: String
+Resources:
+  FilterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: function.lambda_handler
+      Runtime: python3.6
+      MemorySize: 1024
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 's3:GetObject'
+                - 's3:PutObject'
+                - 's3:DeleteObject'
+              Resource: 'arn:aws:s3:::*'
+      Environment:
+        Variables:
+          RESULTS_TABLE: !Ref ResultsTable
+      CodeUri: ./functions/filter-function
+      Timeout: 240
+      Events:
+        PhotoUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref DemoBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  -
+                    Name: prefix
+                    Value: uploads
+
+  DemoBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+
+  ResultsTable:
+    Type: AWS::DynamoDB::SimpleTable
