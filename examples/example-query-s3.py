@@ -4,13 +4,13 @@ s3 = boto3.client('s3')
 # http://boto3.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.select_object_content
 r = s3.select_object_content(
         Bucket='shhorsfi-select-demo',
-        Key='single_file_standard/342d86e2-b54d-4c20-9849-4ac71ac0cdba/profile-c11ae24f-94d9-4b3b-bfb4-1b001d42a82f.txt.gz',
+        Key='standard/c796b57e-c1fd-4c89-a6ba-08b1c9cde66d/profile-3118de38-e4c0-4c2e-984e-873bc4a7d16f.txt.gz',
         ExpressionType='SQL',
-        Expression="select COUNT(*) from s3object s where s.\"mail\" like '%@gmail.com'",
+        Expression="select * from s3object s where s.\"mail\" like '%@gmail.com'",
         InputSerialization = {'CompressionType': 'GZIP',
                               'JSON': {"Type": "LINES"}
                               },
-        OutputSerialization = {'CSV': {}},
+        OutputSerialization = {'JSON': {}},
 )
 
 for event in r['Payload']:
@@ -22,3 +22,4 @@ for event in r['Payload']:
         print("Stats details bytesScanned: ")
         print(statsDetails['BytesScanned'])
         print("Stats details bytesProcessed: ")
+        print(statsDetails['BytesProcessed'])

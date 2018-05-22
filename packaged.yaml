@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: S3 Select Lambda Filtering Demo Function
+Parameters:
+  BucketName:
+    Type: String
+  BucketPrefix:
+    Type: String
+Resources:
+  DemoBucket:
+    Properties:
+      BucketName:
+        Ref: BucketName
+    Type: AWS::S3::Bucket
+  FilterFunction:
+    Properties:
+      CodeUri: s3://shhorsfi-select-demo-deploy/4b85ae8134c268902cbdbb7901321b7c
+      Environment:
+        Variables:
+          RESULTS_TABLE:
+            Ref: ResultsTable
+      Events:
+        PhotoUpload:
+          Properties:
+            Bucket:
+              Ref: DemoBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                - Name: prefix
+                  Value:
+                    Ref: BucketPrefix
+          Type: S3
+      Handler: function.lambda_handler
+      MemorySize: 1024
+      Policies:
+      - Statement:
+        - Action:
+          - s3:GetObject
+          - s3:PutObject
+          - s3:DeleteObject
+          - s3:SelectObjectContent
+          Effect: Allow
+          Resource: arn:aws:s3:::*
+        - Action:
+          - dynamodb:PutItem
+          Effect: Allow
+          Resource:
+            Fn::GetAtt:
+            - ResultsTable
+            - Arn
+        Version: '2012-10-17'
+      Runtime: python3.6
+      Timeout: 240
+    Type: AWS::Serverless::Function
+  ResultsTable:
+    Properties:
+      PrimaryKey:
+        Name: username
+        Type: String
+    Type: AWS::Serverless::SimpleTable
+Transform: AWS::Serverless-2016-10-31

@@ -4,6 +4,8 @@ Description: S3 Select Lambda Filtering Demo Function
 Parameters:
     BucketName:
         Type: String
+    BucketPrefix:
+        Type: String
 Resources:
   FilterFunction:
     Type: AWS::Serverless::Function
@@ -19,7 +21,12 @@ Resources:
                 - 's3:GetObject'
                 - 's3:PutObject'
                 - 's3:DeleteObject'
+                - 's3:SelectObjectContent'
               Resource: 'arn:aws:s3:::*'
+            - Effect: Allow
+              Action:
+                - 'dynamodb:PutItem'
+              Resource: !GetAtt ResultsTable.Arn
       Environment:
         Variables:
           RESULTS_TABLE: !Ref ResultsTable
@@ -36,7 +43,7 @@ Resources:
                 Rules:
                   -
                     Name: prefix
-                    Value: uploads
+                    Value: !Ref BucketPrefix
 
   DemoBucket:
     Type: AWS::S3::Bucket
@@ -44,4 +51,8 @@ Resources:
       BucketName: !Ref BucketName
 
   ResultsTable:
-    Type: AWS::DynamoDB::SimpleTable
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+         Name: username
+         Type: String

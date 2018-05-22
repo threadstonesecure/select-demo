@@ -8,11 +8,12 @@ import csv
 
 from faker import Faker
 
-BATCH_COUNT = 1
-BATCH_SIZE = 100000
-BUCKET = 'shhorsfi-select-demo'
+BATCH_COUNT = 10
+BATCH_SIZE = 100
+BUCKET = 'shhorsfi-select-demo-bucket'
 STANDARD_PREFIX = 'standard'
 GLACIER_PREFIX = 'glacier'
+PROCESS_PREFIX = 'process'
 
 def create_profile():
     fake = Faker()
@@ -59,7 +60,9 @@ def generate_csv_data(bucket, prefix, batch_count, batch_size):
 
 ## Main Execution
 if __name__ == '__main__':
-    print("Generating JSON data for S3 Demo")
-    generate_json_data(BUCKET, STANDARD_PREFIX, BATCH_COUNT, BATCH_SIZE)
-    print("Generating CSV data for Glacier Demo")
-    generate_csv_data(BUCKET, GLACIER_PREFIX, BATCH_COUNT, BATCH_SIZE)
+    #print("Generating JSON data for S3 Demo")
+    #generate_json_data(BUCKET, STANDARD_PREFIX, BATCH_COUNT, BATCH_SIZE)
+    #print("Generating CSV data for Glacier Demo")
+    #generate_csv_data(BUCKET, GLACIER_PREFIX, BATCH_COUNT, BATCH_SIZE)
+    print("Generating JSON data for Process Demo")
+    generate_json_data(BUCKET, PROCESS_PREFIX, BATCH_COUNT, BATCH_SIZE)

@@ -14,7 +14,62 @@ An overview and demo of Amazon S3 SELECT and Amazon Glacier SELECT.
 1. Open S3 Console, View Bucket/Prefix/Key Structure
 2. Navigate to Larger Standard Archive, Select, Check-Box, More-Dropdown, Select From
 3. Demo S3 Select GUI
+4. Run Select Script
 
+```
+python 3 examples/example-query-s3.py
+```
 ## Demo 2 - Glacier Select
 
 1. Open S3 Console, View Bucket/Prefix/Key Structure
+2. Navigate to Larger Glacier Archive, Select, Check-Box, More-Dropdown, Select From
+3. Demo S3 Select GUI
+4. Run Select Script
+
+```
+python 3 examples/example-query-glacier.py
+```
+
+## Demo 3 - Lambda Processing S3 Select to DynamoDB
+
+1. Configure generate-data.py to generate processing data.
+
+```
+python3 generate-data.py
+```
+
+## Running Demo
+
+1. Package and Deploy Lambda function
+
+```
+sam package \
+    --template-file template.yaml \
+    --output-template-file packaged.yaml \
+    --s3-bucket [DEPLOY_BUCKET_NAME]
+
+sam deploy \
+    --template-file packaged.yaml \
+    --stack-name select-demo \
+    --capabilities CAPABILITY_IAM \
+    --parameter-overrides BucketName=[DEMO_BUCKET_NAME] BucketPrefix=[PREFIX_TO_PROCESS]
+
+aws cloudformation describe-stacks \
+    --stack-name select-demo --query 'Stacks[].Outputs'
+
+```
+
+2. Generate Data
+
+```
+NOTE: Update generate-data.py as needed, bucket is created by Lambda function template.
+
+BATCH_COUNT = 1
+BATCH_SIZE = 10
+BUCKET = '[DEMO_BUCKET_NAME]'
+STANDARD_PREFIX = 'standard'
+GLACIER_PREFIX = 'glacier'
+
+python3 generate-data.py
+
+```
