@@ -4,36 +4,61 @@ import gzip
 import io
 import os
 import json
+import csv
 
 from faker import Faker
 
-NUM_BATCH = 1
+BATCH_COUNT = 1
 BATCH_SIZE = 100000
 BUCKET = 'shhorsfi-select-demo'
-PREFIX = 'single_file_archive'
+STANDARD_PREFIX = 'standard'
+GLACIER_PREFIX = 'archive'
 
 def create_profile():
     fake = Faker()
     user = fake.profile()
     return user
 
-## Main Execution
-if __name__ == '__main__':
-
+def generate_json_data(bucket, prefix, batch_count, batch_size):
     s3 = boto3.client('s3')
 
-    print("Generate Random Data")
-    for _ in range(NUM_BATCH):
-        print("\nGenerating Batch: {}".format(_))
+    for _ in range(batch_count):
         batch_id = uuid.uuid4()
-
         outfilename = 'profile-{}.txt.gz'.format(batch_id)
+
         with gzip.open(outfilename, 'wb') as output:
             with io.TextIOWrapper(output, encoding='utf-8', newline='\n') as enc:
-                for _ in range(BATCH_SIZE):
-                    #print('.', end='', flush=True)
+                for _ in range(batch_size):
                     enc.write(json.dumps(create_profile(), default=str))
                     enc.write('\n')
 
-        s3.upload_file(outfilename, BUCKET, '{}/{}/{}'.format(PREFIX, uuid.uuid4(), outfilename))
+        s3.upload_file(outfilename, bucket, '{}/{}/{}'.format(prefix, uuid.uuid4(), outfilename))
         os.remove(outfilename)
+
+def generate_csv_data(bucket, prefix, batch_count, batch_size):
+    s3 = boto3.client('s3')
+
+    batch_id = uuid.uuid4()
+
+    for _ in range(batch_count):
+        outfilename = open('profile-{}.csv'.format(batch_id), 'w')
+        csvwriter = csv.writer(outfilename)
+        count = 0
+        for _ in range(batch_size):
+            profile = create_profile()
+            if count == 0:
+                header = profile.keys()
+                csvwriter.writerow(header)
+                count += 1
+            csvwriter.writerow(profile.values())
+        outfilename.close()
+
+    s3.upload_file(outfilename, bucket, '{}/{}/{}'.format(prefix, uuid.uuid4(), outfilename))
+    os.remove(outfilename)
+
+## Main Execution
+if __name__ == '__main__':
+    #print("Generating JSON data for S3 Demo")
+    #generate_json_data(BUCKET, STANDARD_PREFIX, BATCH_COUNT, BATCH_SIZE)
+    print("Generating CSV data for Glacier Demo")
+    generate_csv_data(BUCKET, GLACIER_PREFIX, BATCH_COUNT, BATCH_SIZE)

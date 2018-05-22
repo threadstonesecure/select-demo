@@ -1,5 +1,5 @@
 # select-demo
-An overview and demo of s3 select and glacier select.
+An overview and demo of Amazon S3 SELECT and Amazon Glacier SELECT.
 
 ## Resources
 
