@@ -14,7 +14,7 @@ An overview and demo of Amazon S3 SELECT and Amazon Glacier SELECT.
 1. Open S3 Console, View Bucket/Prefix/Key Structure
 2. Navigate to Larger Standard Archive, Select, Check-Box, More-Dropdown, Select From
 3. Demo S3 Select GUI
-4. Run Select Script
+4. Show and Exevute Select Script
 
 ```
 python 3 examples/example-query-s3.py
@@ -27,7 +27,7 @@ python 3 examples/example-query-s3.py
 ```
 aws glacier list-vaults --account-id [accountID]
 ```
-3. Execute select script.
+3. Show and Execute Select Script.
 
 ```
 python 3 examples/example-query-glacier.py
@@ -77,3 +77,6 @@ GLACIER_PREFIX = 'glacier'
 python3 generate-data.py
 
 ```
+
+3. Update examples/* scripts as needed.
+4. NOTE: If you want to demo Glacier you need to manually vault an object, or setup a lifecycle policy and wait for the object to be vaulted. Quickest is to download one of the generated .CSVs and manually vault it with the CLI.
