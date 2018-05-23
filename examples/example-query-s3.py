@@ -1,25 +1,69 @@
 import boto3
-s3 = boto3.client('s3')
+import time
+import json
+import io
+import shutil
 
+import gzip
+
+BUCKET = "shhorsfi-select-demo"
+KEY = "standard/c796b57e-c1fd-4c89-a6ba-08b1c9cde66d/profile-3118de38-e4c0-4c2e-984e-873bc4a7d16f.txt.gz"
+
+## S3 Download File
+
+print("\n\nDownloading Object from S3")
+print("-----------------------------------------")
+s1 = time.time()
+s3 = boto3.resource('s3')
+
+bucket = s3.Bucket(BUCKET)
+compressed_fp = io.BytesIO()
+
+with open('download.txt', 'wb') as fp:
+    bucket.download_fileobj(KEY, compressed_fp)
+    compressed_fp.seek(0)
+    with gzip.GzipFile(fileobj=compressed_fp, mode='rb') as gz:
+            shutil.copyfileobj(gz, fp)
+
+with open("download.txt", "r") as profiles:
+    count = 0
+    for line in profiles:
+        profile = json.loads(line)
+        if "@gmail.com" in profile['mail']:
+            count += 1
+
+    print("Record Count: {}".format(count))
+e1 = time.time()
+print("Completed in: {}".format(e1-s1))
+print("-----------------------------------------")
+
+## S3 Select
+print("\n\nSelecing Count of Records")
+print("-----------------------------------------")
+s3 = boto3.client('s3')
+s1 = time.time()
 # http://boto3.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.select_object_content
 r = s3.select_object_content(
         Bucket='shhorsfi-select-demo',
         Key='standard/c796b57e-c1fd-4c89-a6ba-08b1c9cde66d/profile-3118de38-e4c0-4c2e-984e-873bc4a7d16f.txt.gz',
         ExpressionType='SQL',
-        Expression="select * from s3object s where s.\"mail\" like '%@gmail.com'",
+        Expression="select count(*) from s3object s where s.\"mail\" like '%@gmail.com'",
         InputSerialization = {'CompressionType': 'GZIP',
                               'JSON': {"Type": "LINES"}
                               },
-        OutputSerialization = {'JSON': {}},
+        OutputSerialization = {'CSV': {}},
 )
 
 for event in r['Payload']:
     if 'Records' in event:
         records = event['Records']['Payload'].decode('utf-8')
-        print("Response: {}".format(records))
+        print("Record Count: {}".format(records))
     elif 'Stats' in event:
         statsDetails = event['Stats']['Details']
-        print("Stats details bytesScanned: ")
-        print(statsDetails['BytesScanned'])
-        print("Stats details bytesProcessed: ")
-        print(statsDetails['BytesProcessed'])
+        print("Stats details bytesScanned: {} ".format(statsDetails['BytesScanned']))
+        print("Stats details bytesProcessed: {} ".format(statsDetails['BytesProcessed']))
+
+e1 = time.time()
+
+print("Completed in: {}".format(e1-s1))
+print("-----------------------------------------")
