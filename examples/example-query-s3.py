@@ -17,12 +17,12 @@ s1 = time.time()
 s3 = boto3.resource('s3')
 
 bucket = s3.Bucket(BUCKET)
-compressed_fp = io.BytesIO()
+compressed_file = io.BytesIO()
 
 with open('download.txt', 'wb') as fp:
-    bucket.download_fileobj(KEY, compressed_fp)
-    compressed_fp.seek(0)
-    with gzip.GzipFile(fileobj=compressed_fp, mode='rb') as gz:
+    bucket.download_fileobj(KEY, compressed_file)
+    compressed_file.seek(0)
+    with gzip.GzipFile(fileobj=compressed_file, mode='rb') as gz:
             shutil.copyfileobj(gz, fp)
 
 with open("download.txt", "r") as profiles:

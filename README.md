@@ -21,14 +21,18 @@ python 3 examples/example-query-s3.py
 ```
 ## Demo 2 - Glacier Select
 
-1. Open S3 Console, View Bucket/Prefix/Key Structure
-2. Navigate to Larger Glacier Archive, Select, Check-Box, More-Dropdown, Select From
-3. Demo S3 Select GUI
-4. Run Select Script
+1. Open S3 Console and Navigate to Glacier prefix. Show CSV File.
+2. Open Terminal and Show Vault
+
+```
+aws glacier list-vaults --account-id [accountID]
+```
+3. Execute select script.
 
 ```
 python 3 examples/example-query-glacier.py
 ```
+4. Wait for SNS notification, then show restored results in restore prefix.
 
 ## Demo 3 - Lambda Processing S3 Select to DynamoDB
 
