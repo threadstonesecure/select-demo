@@ -14,7 +14,7 @@ An overview and demo of Amazon S3 SELECT and Amazon Glacier SELECT.
 1. Open S3 Console, View Bucket/Prefix/Key Structure
 2. Navigate to Larger Standard Archive, Select, Check-Box, More-Dropdown, Select From
 3. Demo S3 Select GUI
-4. Show and Exevute Select Script
+4. Show and Execute Select Script
 
 ```
 python 3 examples/example-query-s3.py
