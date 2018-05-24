@@ -10,10 +10,9 @@ BUCKET = "shhorsfi-select-demo"
 KEY = "standard/c796b57e-c1fd-4c89-a6ba-08b1c9cde66d/profile-3118de38-e4c0-4c2e-984e-873bc4a7d16f.txt.gz"
 
 ## S3 Download File
-
 print("\n\nDownloading Object from S3")
 print("-----------------------------------------")
-s1 = time.time()
+start_time = time.time()
 s3 = boto3.resource('s3')
 
 bucket = s3.Bucket(BUCKET)
@@ -33,15 +32,15 @@ with open("download.txt", "r") as profiles:
             count += 1
 
     print("Record Count: {}".format(count))
-e1 = time.time()
-print("Completed in: {}".format(e1-s1))
+end_time = time.time()
+print("Completed in: {}".format(end_time-start_time))
 print("-----------------------------------------")
 
 ## S3 Select
 print("\n\nSelecing Count of Records")
 print("-----------------------------------------")
+start_time = time.time()
 s3 = boto3.client('s3')
-s1 = time.time()
 # http://boto3.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.select_object_content
 r = s3.select_object_content(
         Bucket='shhorsfi-select-demo',
@@ -63,7 +62,7 @@ for event in r['Payload']:
         print("Stats details bytesScanned: {} ".format(statsDetails['BytesScanned']))
         print("Stats details bytesProcessed: {} ".format(statsDetails['BytesProcessed']))
 
-e1 = time.time()
+end_time = time.time()
 
-print("Completed in: {}".format(e1-s1))
+print("Completed in: {}".format(end_time-start_time))
 print("-----------------------------------------")

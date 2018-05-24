@@ -19,5 +19,4 @@ jobParameters = {
     }
 }
 
-
 glacier.initiate_job(vaultName="select-demo", jobParameters=jobParameters)
